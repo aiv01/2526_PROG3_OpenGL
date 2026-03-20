@@ -3,13 +3,15 @@
 #include "XWindow.h"
 #include "Ex01TriangleDraw.h"
 #include "Ex02QuadDraw.h"
+#include "Ex03QuadIndexDraw.h"
 
 int main() 
 {
 	XWindow Window{800, 600, "Hello OpenGL"};
 
 	//Ex01TriangleDraw Scene;
-	Ex02QuadDraw Scene;
+	//Ex02QuadDraw Scene;
+	Ex03QuadIndexDraw Scene;
 
 	while(Window.IsOpened()) 
 	{
