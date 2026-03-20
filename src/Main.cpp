@@ -2,12 +2,14 @@
 #include <format>
 #include "XWindow.h"
 #include "Ex01TriangleDraw.h"
+#include "Ex02QuadDraw.h"
 
 int main() 
 {
 	XWindow Window{800, 600, "Hello OpenGL"};
 
-	Ex01TriangleDraw Scene;
+	//Ex01TriangleDraw Scene;
+	Ex02QuadDraw Scene;
 
 	while(Window.IsOpened()) 
 	{

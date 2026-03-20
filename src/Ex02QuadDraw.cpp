@@ -1,4 +1,4 @@
-#include "Ex01TriangleDraw.h"
+#include "Ex02QuadDraw.h"
 #include <fstream>
 #include <vector>
 #include <iostream>
@@ -71,16 +71,22 @@ static GLint CreateProgram(GLuint VertexShaderId, GLuint FragmentShaderId)
     return ProgramId;
 }
 
-Ex01TriangleDraw::Ex01TriangleDraw()
+Ex02QuadDraw::Ex02QuadDraw()
 {
     GLuint VertexShaderId = CreateShader("resources/shaders/triangle.vert", GL_VERTEX_SHADER);
     GLuint FragmentShaderId = CreateShader("resources/shaders/triangle.frag", GL_FRAGMENT_SHADER);
     ProgramId = CreateProgram(VertexShaderId, FragmentShaderId);
 
     std::vector<float> Vertices = {
+        // Triangle Right
         -0.5f, -0.5f, 0.f,    // bottom-left
          0.5f, -0.5f, 0.f,    // bottom-right
-          0.f,  0.5f, 0.f     // top 
+         0.5f,  0.5f, 0.f,    // top-right
+        
+        // Triangle Left
+        -0.5f, -0.5f, 0.f,    // bottom-left
+         0.5f,  0.5f, 0.f,    // top-right
+        -0.5f,  0.5f, 0.f     // top-left  
     };
 
     //1. Create VAO
@@ -104,17 +110,25 @@ Ex01TriangleDraw::Ex01TriangleDraw()
     glClearColor(0.5f, 0.5f, 0.5f, 1.f);
     
     glUseProgram(ProgramId);
+
+    // Draw Point mode
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+    // glPointSize(8);
+
+    // Draw Line mode
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glLineWidth(1);  //implementation gpu dependent. If not available 1 is used.
 }
 
-Ex01TriangleDraw::~Ex01TriangleDraw()
+Ex02QuadDraw::~Ex02QuadDraw()
 {
     glDeleteVertexArrays(1, &Vao);
     glDeleteBuffers(1, &Vbo);
     glDeleteProgram(ProgramId);
 }
 
-void Ex01TriangleDraw::Update(float InDeltaTime)
+void Ex02QuadDraw::Update(float InDeltaTime)
 {
     glClear(GL_COLOR_BUFFER_BIT);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
