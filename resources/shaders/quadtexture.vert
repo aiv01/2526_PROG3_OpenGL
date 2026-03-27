@@ -1,17 +1,14 @@
 #version 460 core
 
 layout (location = 0) in vec3 vert_pos;
-layout (location = 1) in vec3 vert_col;
+layout (location = 1) in vec2 vert_uv;
 
-uniform float scale;
-
-out vec4 vert_col_out;
+out vec2 vert_uv_out;
 
 void main() 
 {
-    //gl_Position = vec4(vert_pos, 1.f);
-    
-    vec3 vert_pos_scaled = vert_pos * scale;
-    gl_Position = vec4(vert_pos_scaled, 1.f);
-    vert_col_out = vec4(vert_col, 1.f);
+    gl_Position = vec4(vert_pos, 1.f);
+    vert_uv_out = vert_uv;
+
+    // vert_uv_out.y = 1.f - vert_uv_out.y;
 }

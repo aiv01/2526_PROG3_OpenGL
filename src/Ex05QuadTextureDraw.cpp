@@ -2,6 +2,7 @@
 #include <vector>
 #include "OGLProgram.h"
 #include <cmath>
+#include "OGLTexture.h"
 
 struct XColor {
     float R;
@@ -10,16 +11,57 @@ struct XColor {
     float A;
 };
 
+/*
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
+GLuint CreateTexture(const std::string& InFilePath)
+{
+    stbi_set_flip_vertically_on_load(true);
+
+    int Width, Height, Channels;
+    uint8_t* Data = stbi_load(InFilePath.c_str(), &Width, &Height, &Channels, 0);
+    if (Data == NULL)
+    {
+        std::cout << "Error reading image: " << InFilePath;
+        throw std::runtime_error("Error reading image");
+    }
+
+    GLenum Format = Channels == 3 ? GL_RGB : GL_RGBA;
+
+    GLuint TextureId;
+    glGenTextures(1, &TextureId);
+    glBindTexture(GL_TEXTURE_2D, TextureId);
+
+    // Upload data to GPU
+    glTexImage2D(GL_TEXTURE_2D, 0, Format, Width, Height, 0, Format, GL_UNSIGNED_BYTE, Data);
+
+    // Wrapping
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    // Filtering
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+    // MipMapping (Optional)
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    stbi_image_free(Data);
+    return TextureId;
+}
+*/
+
 Ex05QuadTextureDraw::Ex05QuadTextureDraw()
 {
     Program = new OGLProgram("resources/shaders/quadtexture.vert", "resources/shaders/quadtexture.frag");
 
     std::vector<float> Vertices = {
-        // Positions        // Colors
-        -0.5f, -0.5f, 0.f,   1.f, 0.f, 0.f,   // bottom-left
-         0.5f, -0.5f, 0.f,   0.f, 1.f, 0.f,   // bottom-right
-         0.5f,  0.5f, 0.f,   0.f, 0.f, 1.f,   // top-right
-        -0.5f,  0.5f, 0.f,   1.f, 1.f, 0.f    // top-left 
+        // Positions         // Uvs
+        -0.5f, -0.5f, 0.f,   0.f, 0.f,   // bottom-left
+         0.5f, -0.5f, 0.f,   1.f, 0.f,   // bottom-right
+         0.5f,  0.5f, 0.f,   1.f, 1.f,   // top-right
+        -0.5f,  0.5f, 0.f,   0.f, 1.f,   // top-left 
     };
 
     std::vector<uint32_t> Indexes = {
@@ -40,11 +82,11 @@ Ex05QuadTextureDraw::Ex05QuadTextureDraw()
 
     //3. Link to Vertex Shader
     GLuint Location_0 = 0;
-    glVertexAttribPointer(Location_0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(Location_0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(Location_0);
 
     GLuint Location_1 = 1;
-    glVertexAttribPointer(Location_1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(Location_1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(Location_1);
 
     //4. Create EBO
@@ -58,10 +100,27 @@ Ex05QuadTextureDraw::Ex05QuadTextureDraw()
     
     Program->Bind();
 
-    GLint BaseColorLocation = glGetUniformLocation(Program->ProgramId, "base_color");
-    XColor BaseColor{0.5f, 0.5f, 0.5f, 1.f};
-    const GLfloat* BaseColorPtr = reinterpret_cast<GLfloat*>(&BaseColor);
-    glUniform4fv(BaseColorLocation, 1, BaseColorPtr);
+    //6. Texture Setup
+    //SmileTextureId = CreateTexture("resources/textures/smile.png");
+    //BoxTextureId = CreateTexture("resources/textures/wood-box.jpg");
+    SmileTexture = new OGLTexture("resources/textures/smile.png");
+    BoxTexture = new OGLTexture("resources/textures/wood-box.jpg");
+
+    //glActiveTexture(GL_TEXTURE0);
+    //glBindTexture(GL_TEXTURE_2D, SmileTextureId);
+    
+    // In case of using `uniform sampler2D smile_tex;` (without layout binding)
+    //glUniform1i(glGetUniformLocation(Program->ProgramId, "smile_tex"), 0);
+
+    //glActiveTexture(GL_TEXTURE1);
+    //glBindTexture(GL_TEXTURE_2D, BoxTextureId);
+
+    SmileTexture->Bind(GL_TEXTURE0);
+    BoxTexture->Bind(GL_TEXTURE1);
+
+    //7. Enable Alpha Blending
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 Ex05QuadTextureDraw::~Ex05QuadTextureDraw()
@@ -69,6 +128,8 @@ Ex05QuadTextureDraw::~Ex05QuadTextureDraw()
     glDeleteVertexArrays(1, &Vao);
     glDeleteBuffers(1, &Vbo);
     glDeleteBuffers(1, &Ebo);
+    //glDeleteTextures(1, &SmileTextureId);
+    //glDeleteTextures(1, &BoxTextureId);
     
     delete Program;
 }
@@ -76,22 +137,6 @@ Ex05QuadTextureDraw::~Ex05QuadTextureDraw()
 void Ex05QuadTextureDraw::Update(float InDeltaTime)
 {
     glClear(GL_COLOR_BUFFER_BIT);
-
-    static float ElapsedTime = 0.f;
-    ElapsedTime += InDeltaTime;
-
-    XColor TimedColor;
-    TimedColor.R = sinf(ElapsedTime) * 0.5f + 0.5;  // [-1; 1] => [0; 1]
-    TimedColor.G = cosf(ElapsedTime) * 0.5f + 0.5;  // [-1; 1] => [0; 1]
-    TimedColor.B = cosf(ElapsedTime + 1.1f) * 0.5f + 0.5;
-    TimedColor.A = 1.f;
-
-    GLint BaseColorLocation = glGetUniformLocation(Program->ProgramId, "base_color");
-    glUniform4fv(BaseColorLocation, 1,  reinterpret_cast<GLfloat*>(&TimedColor));
-
-    float ScaleSpeed = 10.f;
-    float Scale = sinf(ElapsedTime * 10.f)  * 0.5f + 0.5;
-    glUniform1f(glGetUniformLocation(Program->ProgramId, "scale"), Scale);
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
 }

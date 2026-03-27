@@ -12,4 +12,8 @@ private:
     GLuint Vao;
     GLuint Vbo;
     GLuint Ebo;
+    //GLuint SmileTextureId;
+    //GLuint BoxTextureId;
+    class OGLTexture* SmileTexture;
+    class OGLTexture* BoxTexture;
 };
