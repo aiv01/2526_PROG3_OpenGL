@@ -17,9 +17,9 @@ int main()
 	//Ex02QuadDraw Scene;
 	//Ex03QuadIndexDraw Scene;
 	//Ex04QuadColorDraw Scene;
-	//Ex05QuadTextureDraw Scene;
+	Ex05QuadTextureDraw Scene;
 	//Ex06QuadPerspDraw Scene;
-	Ex07CubePerspDraw Scene;
+	//Ex07CubePerspDraw Scene;
 
 	while(Window.IsOpened()) 
 	{

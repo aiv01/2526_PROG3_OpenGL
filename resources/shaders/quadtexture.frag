@@ -16,5 +16,15 @@ void main()
     vec4 smile_texel = texture(smile_tex, vert_uv_out);
     vec4 box_texel = texture(box_tex, vert_uv_out);
 
-    frag_color = mix(smile_texel, box_texel, 0.5f);
+    // Original implementation with side-effect
+    //frag_color = mix(smile_texel, box_texel, 0.5f);
+
+    if (smile_texel.a < 0.f)
+    {
+        frag_color = box_texel;
+    } 
+    else 
+    {
+        frag_color = mix(smile_texel, box_texel, 0.5f);
+    }
 }
