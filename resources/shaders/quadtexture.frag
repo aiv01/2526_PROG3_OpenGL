@@ -12,6 +12,9 @@ out vec4 frag_color;
 
 void main() 
 {
+
+    //BASE and EX1 part
+    
     //frag_color = vec4(1.f, 0.f, 0.f, 1.f);
     //frag_color = texture(smile_tex, vert_uv_out);
 
@@ -23,16 +26,11 @@ void main()
     //frag_color = mix( box_texel,smile_texel, step(0.01,smile_texel.a)*0.5f);
     //still mix factor smile on box
     frag_color = mix( box_texel,smile_texel, step(0.01,smile_texel.a)*(1-mix_factor));
-/*
-    if (smile_texel.a < 0.01)
-    {
-        frag_color = box_texel;
-    }
-    else
-    {
-         frag_color = mix(smile_texel, box_texel, 0.5f);
-
-    }
-*/
     
+
+    
+         /*
+    //EX2 PART (tv noise)
+    frag_color = texture(box_tex, vert_uv_out);
+       */
 }

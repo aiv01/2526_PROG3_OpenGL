@@ -1,11 +1,11 @@
 #pragma once
 #include <glad/gl.h>
 
-class Ex05QuadTextureDraw 
+class Ex07aQuadTextureDraw 
 {
 public:
-    Ex05QuadTextureDraw();
-    ~Ex05QuadTextureDraw();
+    Ex07aQuadTextureDraw();
+    ~Ex07aQuadTextureDraw();
     void Update(float InDeltaTime);
 private:
     class OGLProgram* Program;

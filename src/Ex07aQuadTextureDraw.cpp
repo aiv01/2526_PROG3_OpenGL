@@ -1,4 +1,4 @@
-#include "Ex05QuadTextureDraw.h"
+#include "Ex07aQuadTextureDraw.h"
 #include <vector>
 #include "OGLProgram.h"
 #include <cmath>
@@ -52,7 +52,7 @@ GLuint CreateTexture(const std::string& InFilePath)
 }
 */
 
-Ex05QuadTextureDraw::Ex05QuadTextureDraw()
+Ex07aQuadTextureDraw::Ex07aQuadTextureDraw()
 {
     mix_factor=0.5f;
     Program = new OGLProgram("resources/shaders/quadtexture.vert", "resources/shaders/quadtexture.frag");
@@ -114,6 +114,9 @@ Ex05QuadTextureDraw::Ex05QuadTextureDraw()
     SmileTexture = new OGLTexture("resources/textures/smile.png");
     BoxTexture = new OGLTexture(64, 64);
 
+    //Exercise2 tv noice effect
+    TVNoiseTexure = new OGLTexture(128, 128);
+
     //glActiveTexture(GL_TEXTURE0);
     //glBindTexture(GL_TEXTURE_2D, SmileTextureId);
     
@@ -127,9 +130,11 @@ Ex05QuadTextureDraw::Ex05QuadTextureDraw()
     glUniform1f(MixLocation, mix_factor);
 
     //Execise1 
+    /*
     SmileTexture->Bind(GL_TEXTURE0);
     BoxTexture->Bind(GL_TEXTURE1);
-
+    */
+    TVNoiseTexure->Bind(GL_TEXTURE1);
 
 
     //7. Enable Alpha Blending
@@ -137,7 +142,7 @@ Ex05QuadTextureDraw::Ex05QuadTextureDraw()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-Ex05QuadTextureDraw::~Ex05QuadTextureDraw()
+Ex07aQuadTextureDraw::~Ex07aQuadTextureDraw()
 {
     glDeleteVertexArrays(1, &Vao);
     glDeleteBuffers(1, &Vbo);
@@ -148,8 +153,12 @@ Ex05QuadTextureDraw::~Ex05QuadTextureDraw()
     delete Program;
 }
 
-void Ex05QuadTextureDraw::Update(float InDeltaTime)
+void Ex07aQuadTextureDraw::Update(float InDeltaTime)
 {
+    //Ex2
+    TVNoiseTexure->UpdateRandomPixels();
+
+
     glClear(GL_COLOR_BUFFER_BIT);
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
