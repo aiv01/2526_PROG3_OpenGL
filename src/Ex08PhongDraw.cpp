@@ -77,7 +77,9 @@ Ex08PhongDraw::Ex08PhongDraw()
     glClearColor(0.5f, 0.5f, 0.5f, 1.f);
     
     Program->Bind();
-
+    Program->SetUniform("light_pos", glm::vec3(3.0f, 3.0f, 6.0f));
+    //here i sould put a camera position but i dont have it here
+    Program->SetUniform("view_pos", glm::vec3(0.0f, 0.0f, 6.0f));
     //6. Texture Setup
     TrupTexture = new OGLTexture("resources/models/stormtrooper.png");
     TrupTexture->Bind(GL_TEXTURE0);
@@ -125,7 +127,7 @@ void Ex08PhongDraw::Update(float InDeltaTime)
     glm::mat4 Scale = glm::scale(glm::mat4(1.f), glm::vec3(2.f));
     glm::mat4 Model =  Translate * Rotation * Scale;
     */
-
+    /*
     glm::mat4 Model = glm::mat4(1.f);
     Model = glm::translate(Model, glm::vec3(0, -4, 0));
     Model = glm::rotate(Model, glm::radians(-Angle), glm::vec3(0, 1, 0));
@@ -135,6 +137,24 @@ void Ex08PhongDraw::Update(float InDeltaTime)
 
     Program->SetUniform("mvp", Mvp);
     Program->SetUniform("model", Model);
+    glDrawArrays(GL_TRIANGLES, 0, TrupVertexCount);
+    */
 
+    glm::mat4 Model1 = glm::mat4(1.f);
+    Model1 = glm::translate(Model1, glm::vec3(-2.0f, -4.0f, 0.0f));
+    Model1 = glm::rotate(Model1, glm::radians(Angle), glm::vec3(0, 1, 0));
+    Model1 = glm::scale(Model1, glm::vec3(2.f));
+    glm::mat4 Mvp1 = Projection * View * Model1;
+    Program->SetUniform("mvp", Mvp1);
+    Program->SetUniform("model", Model1);
+    glDrawArrays(GL_TRIANGLES, 0, TrupVertexCount);
+
+    glm::mat4 Model2 = glm::mat4(1.f);
+    Model2 = glm::translate(Model2, glm::vec3(2.0f, -4.0f, 0.0f));
+    Model2 = glm::rotate(Model2, glm::radians(-Angle), glm::vec3(0, 1, 0));
+    Model2 = glm::scale(Model2, glm::vec3(2.f));
+    glm::mat4 Mvp2 = Projection * View * Model2;
+    Program->SetUniform("mvp", Mvp2);
+    Program->SetUniform("model", Model2);
     glDrawArrays(GL_TRIANGLES, 0, TrupVertexCount);
 }
