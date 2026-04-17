@@ -27,4 +27,6 @@ private:
     glm::mat4 Projection;
 
     std::vector<QuadInstance> Quads;
+    GLuint MvpVbo;
+    std::vector<glm::mat4> MvpData;
 };

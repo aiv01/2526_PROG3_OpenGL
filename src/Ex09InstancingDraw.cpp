@@ -84,6 +84,33 @@ Ex09InstancingDraw::Ex09InstancingDraw()
         Quad.Position = glm::vec3(scalar, scalar, 0.f);
         Quad.RotationSpeed = 20.f * (Index + 1);
     }
+
+    // Step 4)
+    MvpData.resize(Quads.size());
+
+    glGenBuffers(1, &MvpVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, MvpVbo);
+    glBufferData(GL_ARRAY_BUFFER, MvpData.size() * sizeof(glm::mat4), NULL, GL_STREAM_DRAW);
+
+    GLuint Location_Mvp = 2;
+    glVertexAttribPointer(Location_Mvp, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)0);
+    glEnableVertexAttribArray(Location_Mvp);
+    glVertexAttribDivisor(Location_Mvp, 1);
+
+    Location_Mvp++;
+    glVertexAttribPointer(Location_Mvp, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(sizeof(glm::vec4)));
+    glEnableVertexAttribArray(Location_Mvp);
+    glVertexAttribDivisor(Location_Mvp, 1);
+
+    Location_Mvp++;
+    glVertexAttribPointer(Location_Mvp, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(2 * sizeof(glm::vec4)));
+    glEnableVertexAttribArray(Location_Mvp);
+    glVertexAttribDivisor(Location_Mvp, 1);
+
+    Location_Mvp++;
+    glVertexAttribPointer(Location_Mvp, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(3 * sizeof(glm::vec4)));
+    glEnableVertexAttribArray(Location_Mvp);
+    glVertexAttribDivisor(Location_Mvp, 1);
 }
 
 Ex09InstancingDraw::~Ex09InstancingDraw()
@@ -149,9 +176,18 @@ void Ex09InstancingDraw::Update(float InDeltaTime)
         Model = glm::rotate(Model, glm::radians(Quad.RotationSpeed * ElapsedTime), glm::vec3(0.f, 0.f, 1.f));
 
         glm::mat4 Mvp = Projection * View * Model;
-        std::string IndexedUniform = std::format("mvp[{}]", Index);
-        Program->SetUniform(IndexedUniform, Mvp);
+        // std::string IndexedUniform = std::format("mvp[{}]", Index);
+        //Program->SetUniform(IndexedUniform, Mvp);
+        
+        //glBindBuffer(MvpVbo);
+        //glBufferSubData(GL_ARRAY_BUFFER, Index * sizeof(glm::mat4), sizeof(glm::mat4), &Mvp);
+
+        MvpData[Index] = Mvp;
     }
+    // Step 4)
+    glBufferSubData(GL_ARRAY_BUFFER, 0, MvpData.size() * sizeof(glm::mat4), MvpData.data());
 
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0, Quads.size());
+
+    
 }
