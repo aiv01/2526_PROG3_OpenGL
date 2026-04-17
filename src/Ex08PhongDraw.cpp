@@ -127,7 +127,7 @@ Ex08PhongDraw::Ex08PhongDraw()
         -0.5f,  0.5f,  0.5f
     };
 
-    //same of before vao
+    //same of the  vao before
     glGenVertexArrays(1, &LightVao);
     glGenBuffers(1, &LightVbo);
     glBindVertexArray(LightVao);
@@ -210,7 +210,7 @@ void Ex08PhongDraw::Update(float InDeltaTime)
     glm::vec3 OrbitCenter = glm::vec3(0.0f, -4.0f, 0.0f);
     float Radius = 3.0f;
 
-    glm::vec3 LightPos;
+    glm::vec3 LightPos;//calculate here the rotation position : copied from stackOverflow:
     LightPos.x = OrbitCenter.x + cos(ElapsedTime) * Radius;
     LightPos.y = OrbitCenter.y + 1.5f;
     LightPos.z = OrbitCenter.z + sin(ElapsedTime) * Radius;
@@ -230,19 +230,19 @@ void Ex08PhongDraw::Update(float InDeltaTime)
     Program->SetUniform("mvp", Mvp);
     Program->SetUniform("model", Model);
     glBindVertexArray(Vao);//need to bind it again after binded the other vao iguess
-    glDrawArrays(GL_TRIANGLES, 0, TrupVertexCount);
+    glDrawArrays(GL_TRIANGLES, 0, TrupVertexCount);//had to  draw arrays in this exercise
 
     //----my cube mod----
     LightProgram->Bind();
 
     glm::mat4 LightModel = glm::mat4(1.f);
     LightModel = glm::translate(LightModel, LightPos);
-    LightModel = glm::scale(LightModel, glm::vec3(0.2f));
+    LightModel = glm::scale(LightModel, glm::vec3(0.2f));//should reduce??
 
     glm::mat4 LightMvp = Projection * View * LightModel;
 
     LightProgram->SetUniform("mvp", LightMvp);
-    LightProgram->SetUniform("color", glm::vec3(1.0f, 1.0f, 0.7f));
+    LightProgram->SetUniform("color", glm::vec3(1.0f, 1.0f, 0.7f));//sending near to white color
 
     glBindVertexArray(LightVao);
     glDrawArrays(GL_TRIANGLES, 0, LightVertexCount);
