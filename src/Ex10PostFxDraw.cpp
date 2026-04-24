@@ -8,7 +8,7 @@
 
 Ex10PostFxDraw::Ex10PostFxDraw()
 {
-    Program = new OGLProgram("resources/shaders/postfx_scene.vert", "resources/shaders/postfx_scene.frag");
+    SceneProgram = new OGLProgram("resources/shaders/postfx_scene.vert", "resources/shaders/postfx_scene.frag");
 
     // Counter-clock wise. Vertex data are NO MORE in NDC space.
         std::vector<float> Vertices = {
@@ -63,8 +63,8 @@ Ex10PostFxDraw::Ex10PostFxDraw()
     };
 
     //1. Create VAO
-    glGenVertexArrays(1, &Vao);
-    glBindVertexArray(Vao);
+    glGenVertexArrays(1, &SceneVao);
+    glBindVertexArray(SceneVao);
 
     //2. Create VBO to load data
     glGenBuffers(1, &Vbo);
@@ -86,17 +86,17 @@ Ex10PostFxDraw::Ex10PostFxDraw()
     glViewport(0, 0, 800, 600);
     glClearColor(0.5f, 0.5f, 0.5f, 1.f);
     
-    Program->Bind();
+    SceneProgram->Bind();
 
     //6. Texture Setup
     BoxTexture = new OGLTexture("resources/textures/wood-box.jpg");
-    BoxTexture->Bind(GL_TEXTURE0);
+    //BoxTexture->Bind(GL_TEXTURE0);
 
     //7. Enable Depth Testing
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_DEPTH_TEST);
 
     //8. Enable Cull Face
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     
     // Camera
     glm::vec3 Position = glm::vec3(0, 0, 4);
@@ -135,6 +135,39 @@ Ex10PostFxDraw::Ex10PostFxDraw()
         throw std::runtime_error("Error creating the framebuffer");
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind and back to swapchain framebuffer
+
+
+    // Define Post FX pipeline
+    FxProgram = new OGLProgram("resources/shaders/postfx_effect.vert", "resources/shaders/postfx_effect.frag");
+
+    std::vector<float> FxVertices = {
+        // Positions      // Uvs
+        -1.f, -1.f,       0.f, 0.f,   // bottom-left
+         1.f, -1.f,       1.f, 0.f,   // bottom-right
+        -1.f,  1.f,       0.f, 1.f,   // top-left 
+
+        -1.f,  1.f,       0.f, 1.f,   // top-left 
+         1.f, -1.f,       1.f, 0.f,   // bottom-right
+         1.f,  1.f,       1.f, 1.f,   // top-right
+    };
+
+    //1. Create VAO
+    glGenVertexArrays(1, &FxVao);
+    glBindVertexArray(FxVao);
+
+    //2. Create VBO to load data
+    glGenBuffers(1, &FxVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, FxVbo);
+
+    size_t FxDataSize = FxVertices.size() * sizeof(float);
+    glBufferData(GL_ARRAY_BUFFER, FxDataSize, FxVertices.data(), GL_STATIC_DRAW);
+
+    //3. Link to Vertex Shader
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 }
 
 Ex10PostFxDraw::~Ex10PostFxDraw()
@@ -143,27 +176,48 @@ Ex10PostFxDraw::~Ex10PostFxDraw()
     glDeleteRenderbuffers(1, &SceneRbo);
     glDeleteTextures(1, &SceneTexture);
 
-    glDeleteVertexArrays(1, &Vao);
+    glDeleteVertexArrays(1, &SceneVao);
     glDeleteBuffers(1, &Vbo);
     delete BoxTexture;
-    delete Program;
+    delete SceneProgram;
+
+    glDeleteVertexArrays(1, &FxVao);
+    glDeleteBuffers(1, &FxVbo);
+    delete FxProgram;
 }
 
 void Ex10PostFxDraw::Update(float InDeltaTime)
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     static float ElapsedTime = 0.f;
     ElapsedTime += InDeltaTime;
     
+    //1. Draw scene (Pass 1)
+    glBindFramebuffer(GL_FRAMEBUFFER, SceneFbo);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     glm::mat4 Model = glm::mat4(1.f);
     Model = glm::translate(Model, glm::vec3(0, 0, -1));
     //Model = glm::rotate(Model, glm::radians(-Angle), glm::vec3(0, 1, 0));
     //Model = glm::scale(Model, glm::vec3(2.f));
-
     glm::mat4 Mvp = Projection * View * Model;
-    Program->SetUniform("mvp", Mvp);
+    
+    glBindVertexArray(SceneVao);
+    SceneProgram->Bind();
+    SceneProgram->SetUniform("mvp", Mvp);
     BoxTexture->Bind(GL_TEXTURE0);
-
     glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    // 2. Post FX (Pass 2)
+    glBindFramebuffer(GL_FRAMEBUFFER, 0); // unbind and back to swapchain framebuffer
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glBindVertexArray(FxVao);
+    FxProgram->Bind();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, SceneTexture);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }

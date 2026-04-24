@@ -10,8 +10,8 @@ public:
     ~Ex10PostFxDraw();
     void Update(float InDeltaTime);
 private:
-    class OGLProgram* Program;
-    GLuint Vao;
+    class OGLProgram* SceneProgram;
+    GLuint SceneVao;
     GLuint Vbo;
     class OGLTexture* BoxTexture;
     glm::mat4 View;
@@ -20,4 +20,8 @@ private:
     GLuint SceneFbo;
     GLuint SceneTexture;
     GLuint SceneRbo;
+
+    class OGLProgram* FxProgram;
+    GLuint FxVao;
+    GLuint FxVbo;
 };
