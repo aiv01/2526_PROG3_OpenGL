@@ -198,9 +198,9 @@ void Ex10PostFxDraw::Update(float InDeltaTime)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glm::mat4 Model = glm::mat4(1.f);
-    Model = glm::translate(Model, glm::vec3(0, 0, -1));
+    Model = glm::translate(Model, glm::vec3(0, 0, -3.5));
     //Model = glm::rotate(Model, glm::radians(-Angle), glm::vec3(0, 1, 0));
-    //Model = glm::scale(Model, glm::vec3(2.f));
+    Model = glm::scale(Model, glm::vec3(2.f));
     glm::mat4 Mvp = Projection * View * Model;
     
     glBindVertexArray(SceneVao);
@@ -217,6 +217,7 @@ void Ex10PostFxDraw::Update(float InDeltaTime)
 
     glBindVertexArray(FxVao);
     FxProgram->Bind();
+    FxProgram->SetUniform("time", ElapsedTime);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, SceneTexture);
     glDrawArrays(GL_TRIANGLES, 0, 6);
