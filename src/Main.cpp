@@ -8,7 +8,7 @@
 #include "Ex05QuadTextureDraw.h"
 #include "Ex06QuadPerspDraw.h"
 #include "Ex07CubePerspDraw.h"
-#include "Ex08PhongDraw.h"
+#include "Ex08PhongDrawC.h"
 
 int main() 
 {
@@ -21,7 +21,7 @@ int main()
 	//Ex05QuadTextureDraw Scene;
 	//Ex06QuadPerspDraw Scene;
 	//Ex07CubePerspDraw Scene;
-	Ex08PhongDraw Scene;
+	Ex08PhongDrawC Scene;
 
 	while(Window.IsOpened()) 
 	{

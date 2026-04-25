@@ -1,21 +1,24 @@
-#include "Ex08PhongDraw.h"
+#include "Ex08PhongDrawB.h"
 #include <vector>
 #include "OGLProgram.h"
 #include <cmath>
 #include "OGLTexture.h"
 #include "ObjParser.h"
 
-Ex08PhongDraw::Ex08PhongDraw()
+Ex08PhongDrawB::Ex08PhongDrawB()
 {
     Program = new OGLProgram("resources/shaders/phong.vert", "resources/shaders/phong.frag");
     LightProgram = new OGLProgram("resources/shaders/light.vert", "resources/shaders/light.frag");
 
 
+    //*******************TROOPER PART*******************
 
     Obj TrupMesh;
     ObjParser::TryParse("resources/models/stormtrooper.obj", TrupMesh);
 
     std::vector<float> Vertices;
+    //Trooper Vertices definition
+    #pragma region
     for(int Index = 0; Index < TrupMesh.triangles.size(); ++Index)
     {
         auto& triangle = TrupMesh.triangles[Index];
@@ -47,10 +50,11 @@ Ex08PhongDraw::Ex08PhongDraw()
         Vertices.push_back(triangle.v3.normal.y);
         Vertices.push_back(triangle.v3.normal.z);
     }
-
     TrupVertexCount = TrupMesh.triangles.size() * 3;
+    #pragma endregion
 
-
+    //Trooper Buffers Manage
+    #pragma region
     //1. Create VAO
     glGenVertexArrays(1, &Vao);
     glBindVertexArray(Vao);
@@ -74,8 +78,13 @@ Ex08PhongDraw::Ex08PhongDraw()
     GLuint Location_2 = 2;
     glVertexAttribPointer(Location_2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
     glEnableVertexAttribArray(Location_2);
+    #pragma endregion
 
-    //----my cube mod----
+    //*******************(2)CUBE PART*******************
+
+    //Cube Vertex definition
+    #pragma region
+    //trying using an const array cause i dont want to modify the cube structure
     const float LightVertices[] =
     {
         // back face 2 rects
@@ -126,28 +135,36 @@ Ex08PhongDraw::Ex08PhongDraw()
         -0.5f,  0.5f, -0.5f,
         -0.5f,  0.5f,  0.5f
     };
-
+    #pragma endregion
+   
+    //Cube Buffers Managem.
+    #pragma region
     //same of the  vao before
-    glGenVertexArrays(1, &LightVao);
-    glGenBuffers(1, &LightVbo);
-    glBindVertexArray(LightVao);
-    glBindBuffer(GL_ARRAY_BUFFER, LightVbo);
 
+    //1. Create VAO
+    glGenVertexArrays(1, &LightVao);
+    glBindVertexArray(LightVao);
+
+    //2. Create VBO to load data
+    glGenBuffers(1, &LightVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, LightVbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(LightVertices), LightVertices, GL_STATIC_DRAW);
 
+    //3. Link to Vertex Shader
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);//location 0 again
     glEnableVertexAttribArray(0);
 
     glBindVertexArray(0);//unbind and bind after
-    //----my cube mod end---
 
+    #pragma endregion
 
+    //**********************COMMON PART (plus textures part******************************************** */
     //4. Set Viewport
-    glViewport(0, 0, 800, 600);
-    glClearColor(0.5f, 0.5f, 0.5f, 1.f);
+    glViewport(0, 0, 800, 600); //TODO SOBSTIITUDE WITH WIDTH AND HEIGHT REF
+    glClearColor(0.5f, 0.5f, 0.5f, 1.f); //background  color
     
     Program->Bind();
-    Program->SetUniform("view_pos", CameraPos);
+    
     //6. Texture Setup
     TrupTexture = new OGLTexture("resources/models/stormtrooper.png");
     TrupTexture->Bind(GL_TEXTURE0);
@@ -159,16 +176,16 @@ Ex08PhongDraw::Ex08PhongDraw()
     glEnable(GL_CULL_FACE);
 
 
-    //---my cube mod----
+    //---my mod----
     CameraPos = glm::vec3(0, 0, 8);
-
+    Program->SetUniform("view_pos", CameraPos);
     // --- my cube mode end ----
 
     // Camera
     glm::vec3 Direction = glm::vec3(0, 0, -1);
     glm::vec3 Up = glm::vec3(0, 1, 0);
     float FovY = 60.f;
-    float AspectRatio = 800.f / 600.f;
+    float AspectRatio = 800.f / 600.f; //TODO SOBSTIITUDE WITH WIDTH AND HEIGHT REF
     float ZNear = 0.01;
     float ZFar = 100.f;
 
@@ -177,7 +194,7 @@ Ex08PhongDraw::Ex08PhongDraw()
 
 }
 
-Ex08PhongDraw::~Ex08PhongDraw()
+Ex08PhongDrawB::~Ex08PhongDrawB()
 {
     glDeleteVertexArrays(1, &Vao);
     glDeleteBuffers(1, &Vbo);
@@ -190,7 +207,7 @@ Ex08PhongDraw::~Ex08PhongDraw()
     delete Program;
 }
 
-void Ex08PhongDraw::Update(float InDeltaTime)
+void Ex08PhongDrawB::Update(float InDeltaTime)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -206,7 +223,7 @@ void Ex08PhongDraw::Update(float InDeltaTime)
     glm::mat4 Model =  Translate * Rotation * Scale;
     */
     
-    //----my cube mod----
+    //----my cube mod ligth update----
     glm::vec3 OrbitCenter = glm::vec3(0.0f, -4.0f, 0.0f);
     float Radius = 3.0f;
 
@@ -229,10 +246,10 @@ void Ex08PhongDraw::Update(float InDeltaTime)
 
     Program->SetUniform("mvp", Mvp);
     Program->SetUniform("model", Model);
-    glBindVertexArray(Vao);//need to bind it again after binded the other vao iguess
+    glBindVertexArray(Vao);//need to bind it again after binded the other vao iguess )unbinded before to be sure)
     glDrawArrays(GL_TRIANGLES, 0, TrupVertexCount);//had to  draw arrays in this exercise
 
-    //----my cube mod----
+    //----my cube mod cube updates----
     LightProgram->Bind();
 
     glm::mat4 LightModel = glm::mat4(1.f);

@@ -4,7 +4,7 @@
 #include <glm/ext.hpp>
 #include "OGLProgram.h"
 
-class Ex08PhongDraw 
+class Ex08PhongDrawA 
 {
 
     OGLProgram* LightProgram = nullptr;
@@ -14,8 +14,8 @@ class Ex08PhongDraw
     glm::vec3 CameraPos;
 
 public:
-    Ex08PhongDraw();
-    ~Ex08PhongDraw();
+    Ex08PhongDrawA();
+    ~Ex08PhongDrawA();
     void Update(float InDeltaTime);
 private:
     class OGLProgram* Program;
