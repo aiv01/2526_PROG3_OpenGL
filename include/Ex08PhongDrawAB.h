@@ -4,18 +4,11 @@
 #include <glm/ext.hpp>
 #include "OGLProgram.h"
 
-class Ex08PhongDrawA 
+class Ex08PhongDrawAB 
 {
-
-    OGLProgram* LightProgram = nullptr;
-    GLuint LightVao = 0;
-    GLuint LightVbo = 0;
-    int LightVertexCount = 36;
-    glm::vec3 CameraPos;
-
 public:
-    Ex08PhongDrawA();
-    ~Ex08PhongDrawA();
+    Ex08PhongDrawAB();
+    ~Ex08PhongDrawAB();
     void Update(float InDeltaTime);
 private:
     class OGLProgram* Program;

@@ -8,6 +8,7 @@
 #include "Ex05QuadTextureDraw.h"
 #include "Ex06QuadPerspDraw.h"
 #include "Ex07CubePerspDraw.h"
+#include "Ex08PhongDrawAB.h"
 #include "Ex08PhongDrawC.h"
 
 int main() 
@@ -21,7 +22,8 @@ int main()
 	//Ex05QuadTextureDraw Scene;
 	//Ex06QuadPerspDraw Scene;
 	//Ex07CubePerspDraw Scene;
-	Ex08PhongDrawC Scene;
+	Ex08PhongDrawAB Scene;
+	//Ex08PhongDrawC Scene;  //uncomment here and comment SCENE AB to test task 3 
 
 	while(Window.IsOpened()) 
 	{
