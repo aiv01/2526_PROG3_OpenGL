@@ -1,8 +1,8 @@
-#include "Ex05QuadTextureDraw.h"
+#include "Ex05QuadTextureDrawC.h"
 #include <vector>
 #include "OGLProgram.h"
 #include <cmath>
-#include "OGLTexture.h"
+#include "OGLTextureC.h"
 
 struct XColor {
     float R;
@@ -11,48 +11,8 @@ struct XColor {
     float A;
 };
 
-/*
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 
-GLuint CreateTexture(const std::string& InFilePath)
-{
-    stbi_set_flip_vertically_on_load(true);
-
-    int Width, Height, Channels;
-    uint8_t* Data = stbi_load(InFilePath.c_str(), &Width, &Height, &Channels, 0);
-    if (Data == NULL)
-    {
-        std::cout << "Error reading image: " << InFilePath;
-        throw std::runtime_error("Error reading image");
-    }
-
-    GLenum Format = Channels == 3 ? GL_RGB : GL_RGBA;
-
-    GLuint TextureId;
-    glGenTextures(1, &TextureId);
-    glBindTexture(GL_TEXTURE_2D, TextureId);
-
-    // Upload data to GPU
-    glTexImage2D(GL_TEXTURE_2D, 0, Format, Width, Height, 0, Format, GL_UNSIGNED_BYTE, Data);
-
-    // Wrapping
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    // Filtering
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-    // MipMapping (Optional)
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    stbi_image_free(Data);
-    return TextureId;
-}
-*/
-
-Ex05QuadTextureDraw::Ex05QuadTextureDraw()
+Ex05QuadTextureDrawC::Ex05QuadTextureDrawC()
 {
     mix_factor=0.5f;
     Program = new OGLProgram("resources/shaders/quadtexture.vert", "resources/shaders/quadtexture.frag");
@@ -101,35 +61,16 @@ Ex05QuadTextureDraw::Ex05QuadTextureDraw()
     
     Program->Bind();
 
-    //6. Texture Setup
-    //SmileTextureId = CreateTexture("resources/textures/smile.png");
-    //BoxTextureId = CreateTexture("resources/textures/wood-box.jpg");
+    //Exercise2 tv noice effect
+    TVNoiseTexure = new OGLTextureC(128, 128);
 
-
-    //base
-    //SmileTexture = new OGLTexture("resources/textures/smile.png");
-    //BoxTexture = new OGLTexture("resources/textures/wood-box.jpg");
-
-    //Exercise1 random image (here mixed with smile texture)
-    SmileTexture = new OGLTexture("resources/textures/smile.png");
-    BoxTexture = new OGLTexture(64, 64);
-
-    //glActiveTexture(GL_TEXTURE0);
-    //glBindTexture(GL_TEXTURE_2D, SmileTextureId);
-    
     // In case of using `uniform sampler2D smile_tex;` (without layout binding)
     //glUniform1i(glGetUniformLocation(Program->ProgramId, "smile_tex"), 0);
-
-    //glActiveTexture(GL_TEXTURE1);
-    //glBindTexture(GL_TEXTURE_2D, BoxTextureId);
 
     GLint MixLocation = glGetUniformLocation(Program->ProgramId, "mix_factor");
     glUniform1f(MixLocation, mix_factor);
 
-    //Execise1 
-    SmileTexture->Bind(GL_TEXTURE0);
-    BoxTexture->Bind(GL_TEXTURE1);
-
+    TVNoiseTexure->Bind(GL_TEXTURE1);
 
 
     //7. Enable Alpha Blending
@@ -137,19 +78,21 @@ Ex05QuadTextureDraw::Ex05QuadTextureDraw()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-Ex05QuadTextureDraw::~Ex05QuadTextureDraw()
+Ex05QuadTextureDrawC::~Ex05QuadTextureDrawC()
 {
     glDeleteVertexArrays(1, &Vao);
     glDeleteBuffers(1, &Vbo);
     glDeleteBuffers(1, &Ebo);
-    //glDeleteTextures(1, &SmileTextureId);
-    //glDeleteTextures(1, &BoxTextureId);
-    
+  
     delete Program;
 }
 
-void Ex05QuadTextureDraw::Update(float InDeltaTime)
+void Ex05QuadTextureDrawC::Update(float InDeltaTime)
 {
+    //Ex2
+    TVNoiseTexure->UpdateRandomPixels();
+
+
     glClear(GL_COLOR_BUFFER_BIT);
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);

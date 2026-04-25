@@ -5,8 +5,9 @@
 #include "Ex02QuadDraw.h"
 #include "Ex03QuadIndexDraw.h"
 #include "Ex04QuadColorDraw.h"
-#include "Ex05QuadTextureDraw.h"
-#include "Ex07aQuadTextureDraw.h"
+#include "Ex05QuadTextureDrawA.h"
+#include "Ex05QuadTextureDrawB.h"
+#include "Ex05QuadTextureDrawC.h"
 
 int main() 
 {
@@ -16,8 +17,10 @@ int main()
 	//Ex02QuadDraw Scene;
 	//Ex03QuadIndexDraw Scene;
 	//Ex04QuadColorDraw Scene;
-	Ex05QuadTextureDraw Scene;
-	//Ex07aQuadTextureDraw Scene;
+	//Ex05QuadTextureDrawA Scene;  //BOX and SMILE
+	Ex05QuadTextureDrawB Scene;  //RANDOM IMAGE AND SMILE
+	//Ex05QuadTextureDrawC Scene;  //TV SCART EFFECT
+	
 
 	while(Window.IsOpened()) 
 	{

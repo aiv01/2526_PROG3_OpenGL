@@ -1,11 +1,11 @@
 #pragma once
 #include <glad/gl.h>
 
-class Ex07aQuadTextureDraw 
+class Ex05QuadTextureDrawC 
 {
 public:
-    Ex07aQuadTextureDraw();
-    ~Ex07aQuadTextureDraw();
+    Ex05QuadTextureDrawC();
+    ~Ex05QuadTextureDrawC();
     void Update(float InDeltaTime);
 private:
     class OGLProgram* Program;
@@ -14,8 +14,8 @@ private:
     GLuint Ebo;
     //GLuint SmileTextureId;
     //GLuint BoxTextureId;
-    class OGLTexture* SmileTexture;
-    class OGLTexture* BoxTexture;
-    class OGLTexture* TVNoiseTexure;
+    class OGLTextureC* SmileTexture;
+    class OGLTextureC* BoxTexture;
+    class OGLTextureC* TVNoiseTexure;
     float mix_factor;
 };
