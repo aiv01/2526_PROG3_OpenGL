@@ -68,8 +68,8 @@ vec4 radial_blur()
 
     // plur strenght increment with the distance from center
     float strength = (dist - radius) * 2f;
-    int samples = int(strength * 20.0);
-    samples = clamp(samples, 1, 40); // clamp to avoid very high values
+    int samples = int(strength * 25.0);
+    samples = clamp(samples, 1, 50); // clamp to avoid very high values
 
     vec2 tex_size = textureSize(scene_tex, 0);
     float uv_w = 1.f / tex_size.x; //800
