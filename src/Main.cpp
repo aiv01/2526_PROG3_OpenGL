@@ -18,8 +18,8 @@ int main()
 	//Ex03QuadIndexDraw Scene;
 	//Ex04QuadColorDraw Scene;
 	//Ex05QuadTextureDrawA Scene;  //BOX and SMILE
-	Ex05QuadTextureDrawB Scene;  //RANDOM IMAGE AND SMILE
-	//Ex05QuadTextureDrawC Scene;  //TV SCART EFFECT
+	//Ex05QuadTextureDrawB Scene;  //RANDOM IMAGE AND SMILE
+	Ex05QuadTextureDrawC Scene;  //TV SCART EFFECT
 	
 
 	while(Window.IsOpened()) 

@@ -92,3 +92,9 @@ GLint CreateProgram(GLuint VertexShaderId, GLuint FragmentShaderId)
     glDeleteShader(FragmentShaderId);
     return ProgramId;
 }
+
+void OGLProgram::SetUniform(const std::string& Name, float Value)
+{
+    GLint location = glGetUniformLocation(ProgramId, Name.c_str());
+    glUniform1f(location, Value);
+}

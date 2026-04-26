@@ -83,8 +83,7 @@ OGLTexture::OGLTexture(int Width, int Height)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    // MipMapping (Optional)
-    glGenerateMipmap(GL_TEXTURE_2D);
+
 }
 
 /*

@@ -15,7 +15,7 @@ struct XColor {
 Ex05QuadTextureDrawC::Ex05QuadTextureDrawC()
 {
     mix_factor=0.5f;
-    Program = new OGLProgram("resources/shaders/quadtexture.vert", "resources/shaders/quadtexture.frag");
+    Program = new OGLProgram("resources/shaders/quadtexture.vert", "resources/shaders/quadtextureC.frag");
 
     std::vector<float> Vertices = {
         // Positions         // Uvs
@@ -62,16 +62,11 @@ Ex05QuadTextureDrawC::Ex05QuadTextureDrawC()
     Program->Bind();
 
     //Exercise2 tv noice effect
-    TVNoiseTexure = new OGLTextureC(128, 128);
+    //TVNoiseTexure = new OGLTextureC(128, 128); //not used anymore
 
-    // In case of using `uniform sampler2D smile_tex;` (without layout binding)
-    //glUniform1i(glGetUniformLocation(Program->ProgramId, "smile_tex"), 0);
+    Program->SetUniform("time", 0);
 
-    GLint MixLocation = glGetUniformLocation(Program->ProgramId, "mix_factor");
-    glUniform1f(MixLocation, mix_factor);
-
-    TVNoiseTexure->Bind(GL_TEXTURE1);
-
+    //TVNoiseTexure->Bind(GL_TEXTURE1);//not used anymore
 
     //7. Enable Alpha Blending
     glEnable(GL_BLEND);
@@ -90,10 +85,14 @@ Ex05QuadTextureDrawC::~Ex05QuadTextureDrawC()
 void Ex05QuadTextureDrawC::Update(float InDeltaTime)
 {
     //Ex2
-    TVNoiseTexure->UpdateRandomPixels();
+    //TVNoiseTexure->UpdateRandomPixels();
 
+    static float ElapsedTime = 0.0f;
+    ElapsedTime += InDeltaTime;
 
     glClear(GL_COLOR_BUFFER_BIT);
+    Program->Bind();
+    Program->SetUniform("time", ElapsedTime);
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
 }
