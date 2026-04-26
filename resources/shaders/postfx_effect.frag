@@ -91,9 +91,46 @@ vec4 radial_blur()
     vec4 color = contrib / total;
     color.a = 1.f;
     return color;
-
-
 }
+
+//alternative, from online sources:
+vec4 radial_blur_directional()
+{
+    vec2 center = vec2(0.5, 0.5);
+    vec2 dir = vert_uv_out - center;
+
+    float dist = length(dir);
+
+    float radius = 0.13;
+
+    if (dist < radius)
+        return texture(scene_tex, vert_uv_out);
+
+    // normalize direction
+    vec2 dir_norm = normalize(dir);
+
+    // streght increase with the distance
+    float strength = (dist - radius) * 0.5;
+
+    int samples = int(strength * 20.0);
+    samples = clamp(samples, 1, 30);
+
+    vec4 contrib = vec4(0.0);
+
+    for(int i = 0; i < samples; ++i)
+    {
+        float t = float(i) / float(samples);
+
+        // campiona lungo la direzione centro → pixel
+        vec2 uv = vert_uv_out - dir_norm * t * strength;
+
+        contrib += texture(scene_tex, uv);
+    }
+
+    return contrib / float(samples);
+}
+
+//TODO fisheye with mesh distorion
 
 void main() 
 {
@@ -146,6 +183,8 @@ void main()
 
     // ---- radial blur (fish eye like) ----//TODO TRY to implement little distortion of the fisheye
     frag_color = radial_blur();
+    //frag_color = radial_blur_directional(); //experiment
+    //frag_color = fisheye; //to do 
 }
 
 
