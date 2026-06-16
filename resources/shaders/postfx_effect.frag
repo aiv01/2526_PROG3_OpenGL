@@ -53,6 +53,85 @@ vec4 quake() {
     return texture(scene_tex, uv_curr);
 }
 
+vec4 radial_blur()
+{
+    vec2 center = vec2(0.5, 0.5);
+    float dist = distance(vert_uv_out, center);
+
+    //No effect radius
+    float radius = 0.13;
+
+    //No effect radius check
+    if (dist < radius)
+        return texture(scene_tex, vert_uv_out);
+
+
+    // plur strenght increment with the distance from center
+    float strength = (dist - radius) * 2f;
+    int samples = int(strength * 25.0);
+    samples = clamp(samples, 1, 50); // clamp to avoid very high values
+
+    vec2 tex_size = textureSize(scene_tex, 0);
+    float uv_w = 1.f / tex_size.x; //800
+    float uv_h = 1.f / tex_size.y; //600
+
+    vec4 contrib = vec4(0.f);
+    for(float i=-samples/2.f; i <= samples/2.f; ++i) 
+    {
+        for(float j=-samples/2.f; j <= samples/2.f; ++j) 
+        {
+            float xoff = uv_w * i;
+            float yoff = uv_h * j;
+            vec2 uv = vec2(vert_uv_out.x + xoff, vert_uv_out.y + yoff);
+            contrib += texture(scene_tex, uv);
+        }
+    }
+
+    float total = (samples + 1) * (samples + 1);// must consider the 0 value
+    vec4 color = contrib / total;
+    color.a = 1.f;
+    return color;
+}
+
+//alternative, from online sources:
+vec4 radial_blur_directional()
+{
+    vec2 center = vec2(0.5, 0.5);
+    vec2 dir = vert_uv_out - center;
+
+    float dist = length(dir);
+
+    float radius = 0.13;
+
+    if (dist < radius)
+        return texture(scene_tex, vert_uv_out);
+
+    // normalize direction
+    vec2 dir_norm = normalize(dir);
+
+    // streght increase with the distance
+    float strength = (dist - radius) * 0.5;
+
+    int samples = int(strength * 20.0);
+    samples = clamp(samples, 1, 30);
+
+    vec4 contrib = vec4(0.0);
+
+    for(int i = 0; i < samples; ++i)
+    {
+        float t = float(i) / float(samples);
+
+        // campiona lungo la direzione centro → pixel
+        vec2 uv = vert_uv_out - dir_norm * t * strength;
+
+        contrib += texture(scene_tex, uv);
+    }
+
+    return contrib / float(samples);
+}
+
+//TODO fisheye with mesh distorion
+
 void main() 
 {
     // As-Is
@@ -90,7 +169,7 @@ void main()
         frag_color = texture(scene_tex, vert_uv_out);
     }
     */
-
+    
     // Blur
     //frag_color = blur();
 
@@ -98,5 +177,14 @@ void main()
     //frag_color = wave();
 
     // Quake
-    frag_color = quake();
+    //frag_color = quake();
+    
+
+
+    // ---- radial blur (fish eye like) ----//TODO TRY to implement little distortion of the fisheye
+    frag_color = radial_blur();
+    //frag_color = radial_blur_directional(); //experiment
+    //frag_color = fisheye; //to do 
 }
+
+
